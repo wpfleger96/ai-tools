@@ -161,11 +161,11 @@ def safe_get_file_size(file_path: str) -> int:
 def format_context_info(transcript_path: str, model_id: str) -> str:
     """Format context usage information for display."""
     if not transcript_path or not os.path.isfile(transcript_path):
-        return " Context: No active transcript"
+        return f" Context: {COLOR_DIM}No active transcript{COLOR_RESET}"
 
     char_count = safe_get_file_size(transcript_path)
     if char_count == 0:
-        return " Context: Empty transcript"
+        return f" Context: {COLOR_DIM}Empty transcript{COLOR_RESET}"
 
     token_estimate = char_count // CHARS_PER_TOKEN
     context_limit = get_context_limit(model_id)
@@ -207,7 +207,9 @@ def get_dir_basename(cwd: str) -> str:
 
 def get_cost_color(cost_usd: float) -> str:
     """Get color based on cost amount."""
-    if cost_usd < 5.0:
+    if cost_usd == 0.0:
+        return COLOR_DIM
+    elif cost_usd < 5.0:
         return COLOR_GREEN
     elif cost_usd < 10.0:
         return COLOR_YELLOW
@@ -216,28 +218,25 @@ def get_cost_color(cost_usd: float) -> str:
 
 def format_cost(cost_data: Dict) -> str:
     """Format cost information for display."""
-    if not cost_data:
-        return ""
-
-    cost_usd = cost_data.get("total_cost_usd", 0)
-    lines_added = cost_data.get("total_lines_added", 0)
-    lines_removed = cost_data.get("total_lines_removed", 0)
+    cost_usd = cost_data.get("total_cost_usd", 0) if cost_data else 0
+    lines_added = cost_data.get("total_lines_added", 0) if cost_data else 0
+    lines_removed = cost_data.get("total_lines_removed", 0) if cost_data else 0
 
     parts = []
 
-    if cost_usd > 0:
-        cost_color = get_cost_color(cost_usd)
-        parts.append(f"Cost: {cost_color}${cost_usd:.2f}{COLOR_RESET} USD")
+    # Always show cost, even if $0.00
+    cost_color = get_cost_color(cost_usd)
+    parts.append(f"Cost: {cost_color}${cost_usd:.2f}{COLOR_RESET} USD")
 
-    if lines_added > 0:
-        parts.append(f"{COLOR_GREEN}+{lines_added} lines added{COLOR_RESET}")
+    # Always show lines added, even if 0
+    added_color = COLOR_DIM if lines_added == 0 else COLOR_GREEN
+    parts.append(f"{added_color}+{lines_added} lines added{COLOR_RESET}")
 
-    if lines_removed > 0:
-        parts.append(f"{COLOR_RED}-{lines_removed} lines removed{COLOR_RESET}")
+    # Always show lines removed, even if 0
+    removed_color = COLOR_DIM if lines_removed == 0 else COLOR_RED
+    parts.append(f"{removed_color}-{lines_removed} lines removed{COLOR_RESET}")
 
-    if parts:
-        return " | " + " | ".join(parts)
-    return ""
+    return " | " + " | ".join(parts)
 
 
 def main():

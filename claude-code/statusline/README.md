@@ -19,18 +19,21 @@ A Python script that generates a formatted [status line](https://docs.anthropic.
 - **Progress Bar**: 10-segment bar using filled (●) and empty (○) circles
 - **Color Coding**:
   - Context usage:
+    - Grey: No active transcript or empty transcript
     - Green: < 50% usage
     - Yellow: 50-79% usage
     - Red: >= 80% usage
   - Cost tracking:
-    - Green: < $5.00 USD
-    - Yellow: $5.00-9.99 USD
+    - Grey: $0.00 USD (no cost incurred yet)
+    - Green: $0.01-$4.99 USD
+    - Yellow: $5.00-$9.99 USD
     - Red: >= $10.00 USD
 
 ### Cost Tracking
-- Displays total cost in USD for the current session
-- Shows lines added (green) and removed (red) during the session
-- Cost information appears after context usage when available
+- Always displays total cost in USD for the current session (starts at $0.00)
+- Always shows lines added and lines removed for the session (starts at +0/-0)
+- Uses grey color for zero values, green for lines added (>0), red for lines removed (>0)
+- Cost information appears after context usage
 
 ## Usage
 
@@ -48,10 +51,6 @@ Add a `statusLine` section to your `~/.claude/settings.json` file with the follo
 ## Example Outputs
 
 ```
-Opus 4.1 | wpfleger-ai-tools | Context: ○○○○○○○○○○ 0% (783/200K tokens)
-```
-
-```
 Opus 4.1 | wpfleger-ai-tools | Context: ●●●●●●○○○○ 60% (120K/200K tokens) | Cost: $2.50 USD | +150 lines added | -25 lines removed
 ```
 
@@ -60,5 +59,9 @@ Opus 4.1 | wpfleger-ai-tools | Context: ●●●●●●●●●○ 90% (180K
 ```
 
 ```
-Opus 4.1 | wpfleger-ai-tools | Context: No active transcript
+Opus 4.1 | wpfleger-ai-tools | Context: ○○○○○○○○○○ 0% (783/200K tokens) | Cost: $0.00 USD | +0 lines added | -0 lines removed
+```
+
+```
+Opus 4.1 | wpfleger-ai-tools | Context: No active transcript | Cost: $0.00 USD | +0 lines added | -0 lines removed
 ```
