@@ -180,7 +180,7 @@ def format_context_info(transcript_path: str, model_id: str) -> str:
     return ""
 
 
-def parse_input_data() -> Tuple[str, str, str, str]:
+def parse_input_data() -> Tuple[str, str, str, str, Dict]:
     """Parse JSON input from stdin and extract relevant fields."""
     try:
         input_data = sys.stdin.read()
@@ -192,8 +192,9 @@ def parse_input_data() -> Tuple[str, str, str, str]:
     transcript_path = data.get("transcript_path", "")
     model_id = data.get("model", {}).get("id", "")
     model_name = data.get("model", {}).get("display_name", "")
+    cost_data = data.get("cost", {})
 
-    return cwd, transcript_path, model_id, model_name
+    return cwd, transcript_path, model_id, model_name, cost_data
 
 
 def get_dir_basename(cwd: str) -> str:
@@ -204,14 +205,50 @@ def get_dir_basename(cwd: str) -> str:
         return ""
 
 
+def get_cost_color(cost_usd: float) -> str:
+    """Get color based on cost amount."""
+    if cost_usd < 5.0:
+        return COLOR_GREEN
+    elif cost_usd < 10.0:
+        return COLOR_YELLOW
+    return COLOR_RED
+
+
+def format_cost(cost_data: Dict) -> str:
+    """Format cost information for display."""
+    if not cost_data:
+        return ""
+
+    cost_usd = cost_data.get("total_cost_usd", 0)
+    lines_added = cost_data.get("total_lines_added", 0)
+    lines_removed = cost_data.get("total_lines_removed", 0)
+
+    parts = []
+
+    if cost_usd > 0:
+        cost_color = get_cost_color(cost_usd)
+        parts.append(f"Cost: {cost_color}${cost_usd:.2f}{COLOR_RESET} USD")
+
+    if lines_added > 0:
+        parts.append(f"{COLOR_GREEN}+{lines_added} lines added{COLOR_RESET}")
+
+    if lines_removed > 0:
+        parts.append(f"{COLOR_RED}-{lines_removed} lines removed{COLOR_RESET}")
+
+    if parts:
+        return " | " + " | ".join(parts)
+    return ""
+
+
 def main():
     """Main entry point."""
-    cwd, transcript_path, model_id, model_name = parse_input_data()
+    cwd, transcript_path, model_id, model_name, cost_data = parse_input_data()
     context_info = format_context_info(transcript_path, model_id)
     dir_basename = get_dir_basename(cwd)
+    cost_info = format_cost(cost_data)
 
     print(
-        f"{COLOR_BLUE}{model_name}{COLOR_RESET} | {COLOR_DIM}{dir_basename}{COLOR_RESET} |{context_info}",
+        f"{COLOR_BLUE}{model_name}{COLOR_RESET} | {COLOR_DIM}{dir_basename}{COLOR_RESET} |{context_info}{cost_info}",
         end="",
     )
 

@@ -18,9 +18,19 @@ A Python script that generates a formatted [status line](https://docs.anthropic.
 ### Visual Indicators
 - **Progress Bar**: 10-segment bar using filled (●) and empty (○) circles
 - **Color Coding**:
-  - Green: < 50% usage
-  - Yellow: 50-79% usage
-  - Red: >= 80% usage
+  - Context usage:
+    - Green: < 50% usage
+    - Yellow: 50-79% usage
+    - Red: >= 80% usage
+  - Cost tracking:
+    - Green: < $5.00 USD
+    - Yellow: $5.00-9.99 USD
+    - Red: >= $10.00 USD
+
+### Cost Tracking
+- Displays total cost in USD for the current session
+- Shows lines added (green) and removed (red) during the session
+- Cost information appears after context usage when available
 
 ## Usage
 
@@ -42,11 +52,11 @@ Opus 4.1 | wpfleger-ai-tools | Context: ○○○○○○○○○○ 0% (783/2
 ```
 
 ```
-Opus 4.1 | wpfleger-ai-tools | Context: ●●●●●●○○○○ 60% (120K/200K tokens)
+Opus 4.1 | wpfleger-ai-tools | Context: ●●●●●●○○○○ 60% (120K/200K tokens) | Cost: $2.50 USD | +150 lines added | -25 lines removed
 ```
 
 ```
-Opus 4.1 | wpfleger-ai-tools | Context: ●●●●●●●●●○ 90% (180K/200K tokens)
+Opus 4.1 | wpfleger-ai-tools | Context: ●●●●●●●●●○ 90% (180K/200K tokens) | Cost: $8.75 USD | +500 lines added | -100 lines removed
 ```
 
 ```
